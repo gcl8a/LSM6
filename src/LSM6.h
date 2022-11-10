@@ -1,6 +1,8 @@
 #ifndef LSM6_h
 #define LSM6_h
 
+// Datasheet: https://www.pololu.com/file/0J1087/LSM6DS33.pdf
+
 #include <Arduino.h>
 
 class LSM6

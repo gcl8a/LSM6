@@ -1,5 +1,4 @@
-#ifndef LSM6_h
-#define LSM6_h
+#pragma once
 
 // Datasheet: https://www.pololu.com/file/0J1087/LSM6DS33.pdf
 
@@ -150,5 +149,3 @@ public:
 
     int16_t testReg(uint8_t address, regAddr reg);
 };
-
-#endif

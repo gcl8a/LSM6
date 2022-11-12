@@ -46,9 +46,10 @@ uint16_t LSM6::getTimeout()
 void LSM6::setFullScaleGyro(GYRO_FS gfs)
 {
   uint8_t settings = readReg(LSM6::CTRL2_G);
-  settings &= 0xf0; //clear sensitivity bits; can't use 125 setting
+  settings &= 0xf0; //clear sensitivity bits; can't use 125 setting; bit 0 must be 0
   switch (gfs)
   {
+  
   case GYRO_FS245:
     writeReg(LSM6::CTRL2_G, settings | 0b00000000);
     mdpsPerLSB = 8.75;
@@ -73,23 +74,23 @@ void LSM6::setFullScaleGyro(GYRO_FS gfs)
 void LSM6::setFullScaleAcc(ACC_FS afs)
 {
   uint8_t settings = readReg(LSM6::CTRL1_XL);
-  settings &= 0xf0; //clear sensitivity bits
+  settings &= 0xf3; //clear sensitivity bits
   switch (afs)
   {
   case ACC_FS2:
-    writeReg(LSM6::CTRL1_XL, 0b00000000);
+    writeReg(LSM6::CTRL1_XL, settings | 0b00000000);
     mgPerLSB = 0.061;
     break;
   case ACC_FS4:
-    writeReg(LSM6::CTRL1_XL, 0b00001000); 
+    writeReg(LSM6::CTRL1_XL, settings | 0b00001000); 
     mgPerLSB = 0.122;
     break;
   case ACC_FS8:
-    writeReg(LSM6::CTRL1_XL, 0b00001100);
+    writeReg(LSM6::CTRL1_XL, settings | 0b00001100);
     mgPerLSB = 0.244;
     break;
   case ACC_FS16:
-    writeReg(LSM6::CTRL1_XL, 0b00000100);
+    writeReg(LSM6::CTRL1_XL, settings | 0b00000100);
     mgPerLSB = 0.488;
     break;
   default:
@@ -99,6 +100,8 @@ void LSM6::setFullScaleAcc(ACC_FS afs)
 
 void LSM6::setGyroDataOutputRate(ODR rate)
 {
+  Serial.print("Setting Gyro ODR: ");
+  Serial.println(rate);
   if(rate < 0 || rate > ODR166k) 
   {
     Serial.println(F("Illegal gyro ODR"));
@@ -115,6 +118,8 @@ void LSM6::setGyroDataOutputRate(ODR rate)
 
 void LSM6::setAccDataOutputRate(ODR rate)
 {
+  Serial.print("Setting Acc ODR: ");
+  Serial.println(rate);
   if(rate < 0 || rate > ODR166k) 
   {
     Serial.println(F("Illegal acc ODR"));
@@ -128,7 +133,6 @@ void LSM6::setAccDataOutputRate(ODR rate)
   // rate in this case is just a flag for the ODR [1 <= rate <= 8]
   // corresponding to [13, 26, 52, ..., 1664] Hz
   accODR = 13 * pow(2, rate - 1); 
-
 }
 
 bool LSM6::init(deviceType device, sa0State sa0)
@@ -172,13 +176,14 @@ bool LSM6::init(deviceType device, sa0State sa0)
 
   switch (device)
   {
-  case device_DS33:
+  case device_DS33: // only this IMU for now...
     address = (sa0 == sa0_high) ? DS33_SA0_HIGH_ADDRESS : DS33_SA0_LOW_ADDRESS;
     break;
-  default:;
+  default:
+    break;
   }
 
-  enableDefault();
+  //enableDefault();
 
   return true;
 }
@@ -196,13 +201,13 @@ void LSM6::enableDefault(void)
 {
   if (_device == device_DS33)
   {
-    // Set the accelerometer full scale and data rate
-    setAccDataOutputRate(LSM6::ODR13);
-    setFullScaleAcc(ACC_FS2);
-
     // Set the gyro full scale and data rate
-    setGyroDataOutputRate(LSM6::ODR13);
     setFullScaleGyro(GYRO_FS245);
+    setGyroDataOutputRate(ODR13);
+
+    // Set the accelerometer full scale and data rate
+    setFullScaleAcc(ACC_FS2);
+    setAccDataOutputRate(ODR13);
 
     // Auto-increment
     writeReg(CTRL3_C, 0x04);

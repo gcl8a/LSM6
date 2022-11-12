@@ -178,34 +178,24 @@ bool LSM6::init(deviceType device, sa0State sa0)
 Enables the LSM6's accelerometer and gyro. Also:
 - Sets sensor full scales (gain) to default power-on values, which are
   +/- 2 g for accelerometer and 245 dps for gyro
-- Selects 1.66 kHz (high performance) ODR (output data rate) for accelerometer
-  and 1.66 kHz (high performance) ODR for gyro. (These are the ODR settings for
-  which the electrical characteristics are specified in the datasheet.)
+- Selects 13 Hz ODR (VERY SLOW!) for accelerometer and gyro
 - Enables automatic increment of register address during multiple byte access
-Note that this function will also reset other settings controlled by
+- Note that this function will also reset other settings controlled by
 the registers it writes to.
 */
 void LSM6::enableDefault(void)
 {
   if (_device == device_DS33)
   {
-    // Accelerometer
-
-    // 0x80 = 0b10000000
-    // ODR = 1000 (1.66 kHz (high performance)); FS_XL = 00 (+/-2 g full scale)
-    //writeReg(CTRL1_XL, 0x80);
+    // Set the accelerometer full scale and data rate
+    setAccDataOutputRate(LSM6::ODR13);
     setFullScaleAcc(ACC_FS2);
 
-    // Gyro
-
-    // 0x80 = 0b010000000
-    // ODR = 1000 (1.66 kHz (high performance)); FS_XL = 00 (245 dps)
-    //writeReg(CTRL2_G, 0x80);
+    // Set the gyro full scale and data rate
+    setGyroDataOutputRate(LSM6::ODR13);
     setFullScaleGyro(GYRO_FS245);
-    // Common
 
-    // 0x04 = 0b00000100
-    // IF_INC = 1 (automatically increment register address)
+    // Auto-increment
     writeReg(CTRL3_C, 0x04);
   }
 }

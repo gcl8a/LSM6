@@ -294,10 +294,6 @@ void LSM6::readGyro(void)
   g.x = (int16_t)(xhg << 8 | xlg);
   g.y = (int16_t)(yhg << 8 | ylg);
   g.z = (int16_t)(zhg << 8 | zlg);
-
-  dps.x = g.x * mdps / 1000.;
-  dps.y = g.y * mdps / 1000.;
-  dps.z = g.z * mdps / 1000.;
 }
 
 // Reads all 6 channels of the LSM6 and stores them in the object variables

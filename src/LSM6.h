@@ -15,8 +15,11 @@ class LSM6
     enum deviceType { device_DS33, device_auto };
     enum sa0State { sa0_low, sa0_high, sa0_auto };
 
+    // full-scale factors
     enum ACC_FS {ACC_FS2, ACC_FS4, ACC_FS8, ACC_FS16};
     enum GYRO_FS {GYRO_FS245, GYRO_FS500, GYRO_FS1000, GYRO_FS2000};
+
+    // output data rate options
     enum ODR 
     {
       ODR13 = 0x1, 
@@ -104,15 +107,8 @@ class LSM6
 
     vector<int16_t> a; // accelerometer readings
     vector<int16_t> g; // gyro readings
-    vector<float> dps;
 
-    //conversion factors
-    float mdps = 0;
-    float mg = 0;
-    //float odrGyro = 0;
-
-    uint8_t last_status; // status of last I2C transmission
-
+public:
     LSM6(void);
 
     bool init(deviceType device = device_auto, sa0State sa0 = sa0_auto);
@@ -120,7 +116,6 @@ class LSM6
 
     void enableDefault(void);
 
-public:
     void writeReg(uint8_t reg, uint8_t value);
     uint8_t readReg(uint8_t reg);
 
@@ -140,7 +135,7 @@ public:
 
     uint8_t getStatus(void) {return readReg(LSM6::STATUS_REG);}
 
-  private:
+  protected:
     deviceType _device; // chip type
     uint8_t address;
 
@@ -148,4 +143,11 @@ public:
     bool did_timeout;
 
     int16_t testReg(uint8_t address, regAddr reg);
+
+    //conversion factors
+    float mdps = 0;
+    float mg = 0;
+
+    uint8_t last_status; // status of last I2C transmission
+
 };

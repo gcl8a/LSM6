@@ -151,5 +151,4 @@ public:
     float gyroODR = 0;  // Hz
 
     uint8_t last_status; // status of last I2C transmission
-
 };

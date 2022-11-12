@@ -49,7 +49,6 @@ void LSM6::setFullScaleGyro(GYRO_FS gfs)
   settings &= 0xf0; //clear sensitivity bits; can't use 125 setting; bit 0 must be 0
   switch (gfs)
   {
-  
   case GYRO_FS245:
     writeReg(LSM6::CTRL2_G, settings | 0b00000000);
     mdpsPerLSB = 8.75;
@@ -69,6 +68,10 @@ void LSM6::setFullScaleGyro(GYRO_FS gfs)
   default:
     Serial.println("Error setting gyro sensitivity!");
   }
+
+  Serial.print("Setting Gyro FS to ");
+  Serial.print(mdpsPerLSB);
+  Serial.println(" mdps per LSB.");
 }
 
 void LSM6::setFullScaleAcc(ACC_FS afs)
@@ -96,12 +99,14 @@ void LSM6::setFullScaleAcc(ACC_FS afs)
   default:
     Serial.println("Error setting acc sensitivity!");
   }
+
+  Serial.print("Setting Acc FS to ");
+  Serial.print(mgPerLSB, 3);
+  Serial.println(" mg per LSB.");
 }
 
 void LSM6::setGyroDataOutputRate(ODR rate)
 {
-  Serial.print("Setting Gyro ODR: ");
-  Serial.println(rate);
   if(rate < 0 || rate > ODR166k) 
   {
     Serial.println(F("Illegal gyro ODR"));
@@ -114,12 +119,14 @@ void LSM6::setGyroDataOutputRate(ODR rate)
   // rate in this case is just a flag for the ODR [1 <= rate <= 8]
   // corresponding to [13, 26, 52, ..., 1664] Hz
   gyroODR = 13 * pow(2, rate - 1); 
+
+  Serial.print("Setting Gyro ODR to ");
+  Serial.print(gyroODR);
+  Serial.println(" Hz.");
 }
 
 void LSM6::setAccDataOutputRate(ODR rate)
 {
-  Serial.print("Setting Acc ODR: ");
-  Serial.println(rate);
   if(rate < 0 || rate > ODR166k) 
   {
     Serial.println(F("Illegal acc ODR"));
@@ -133,6 +140,10 @@ void LSM6::setAccDataOutputRate(ODR rate)
   // rate in this case is just a flag for the ODR [1 <= rate <= 8]
   // corresponding to [13, 26, 52, ..., 1664] Hz
   accODR = 13 * pow(2, rate - 1); 
+
+  Serial.print("Setting Acc ODR to ");
+  Serial.print(accODR);
+  Serial.println(" Hz.");
 }
 
 bool LSM6::init(deviceType device, sa0State sa0)
@@ -183,7 +194,7 @@ bool LSM6::init(deviceType device, sa0State sa0)
     break;
   }
 
-  //enableDefault();
+  enableDefault();
 
   return true;
 }

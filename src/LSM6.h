@@ -139,8 +139,8 @@ public:
     deviceType _device; // chip type
     uint8_t address;
 
-    uint16_t io_timeout;
-    bool did_timeout;
+    uint16_t io_timeout = 0;
+    bool did_timeout = false;
 
     int16_t testReg(uint8_t address, regAddr reg);
 

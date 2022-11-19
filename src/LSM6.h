@@ -144,8 +144,16 @@ public:
     deviceType _device; // chip type
     uint8_t address;
 
-    uint16_t io_timeout;
-    bool did_timeout;
+    uint16_t io_timeout = 0;
+    bool did_timeout = false;
 
     int16_t testReg(uint8_t address, regAddr reg);
+
+//conversion factors are set when you change ODR or FS
+    float mdpsPerLSB = 0;
+    float mgPerLSB = 0;
+    float accODR = 0;   // Hz
+    float gyroODR = 0;  // Hz
+
+    uint8_t last_status; // status of last I2C transmission
 };

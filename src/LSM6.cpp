@@ -46,55 +46,63 @@ uint16_t LSM6::getTimeout()
 void LSM6::setFullScaleGyro(GYRO_FS gfs)
 {
   uint8_t settings = readReg(LSM6::CTRL2_G);
-  settings &= 0xf0; //clear sensitivity bits; can't use 125 setting
+  settings &= 0xf0; //clear sensitivity bits; can't use 125 setting; bit 0 must be 0
   switch (gfs)
   {
   case GYRO_FS245:
     writeReg(LSM6::CTRL2_G, settings | 0b00000000);
-    mdps = 8.75;
+    mdpsPerLSB = 8.75;
     break;
   case GYRO_FS500:
     writeReg(LSM6::CTRL2_G, settings | 0b00000100);
-    mdps = 17.5;
+    mdpsPerLSB = 17.5;
     break;
   case GYRO_FS1000:
     writeReg(LSM6::CTRL2_G, settings | 0b00001000);
-    mdps = 35;
+    mdpsPerLSB = 35;
     break;
   case GYRO_FS2000:
     writeReg(LSM6::CTRL2_G, settings | 0b00001100);
-    mdps = 70;
+    mdpsPerLSB = 70;
     break;
   default:
     Serial.println("Error setting gyro sensitivity!");
   }
+
+  Serial.print("Setting Gyro FS to ");
+  Serial.print(mdpsPerLSB);
+  Serial.println(" mdps per LSB.");
 }
 
 void LSM6::setFullScaleAcc(ACC_FS afs)
 {
   uint8_t settings = readReg(LSM6::CTRL1_XL);
-  settings &= 0xf0; //clear sensitivity bits
+  settings &= 0xf3; //clear sensitivity bits
   switch (afs)
   {
   case ACC_FS2:
-    writeReg(LSM6::CTRL1_XL, 0b00000000);
-    mg = 0.061;
+    writeReg(LSM6::CTRL1_XL, settings | 0b00000000);
+    mgPerLSB = 0.061;
     break;
   case ACC_FS4:
-    writeReg(LSM6::CTRL1_XL, 0b00001000); 
-    mg = 0.122;
+    writeReg(LSM6::CTRL1_XL, settings | 0b00001000); 
+    mgPerLSB = 0.122;
     break;
   case ACC_FS8:
-    writeReg(LSM6::CTRL1_XL, 0b00001100);
-    mg = 0.244;
+    writeReg(LSM6::CTRL1_XL, settings | 0b00001100);
+    mgPerLSB = 0.244;
     break;
   case ACC_FS16:
-    writeReg(LSM6::CTRL1_XL, 0b00000100);
-    mg = 0.488;
+    writeReg(LSM6::CTRL1_XL, settings | 0b00000100);
+    mgPerLSB = 0.488;
     break;
   default:
     Serial.println("Error setting acc sensitivity!");
   }
+
+  Serial.print("Setting Acc FS to ");
+  Serial.print(mgPerLSB, 3);
+  Serial.println(" mg per LSB.");
 }
 
 void LSM6::setGyroDataOutputRate(ODR rate)
@@ -107,6 +115,14 @@ void LSM6::setGyroDataOutputRate(ODR rate)
   uint8_t settings = readReg(LSM6::CTRL2_G);
   settings &= 0x0f; //clear ODR bits
   writeReg(LSM6::CTRL2_G, settings | (rate << 4));
+
+  // rate in this case is just a flag for the ODR [1 <= rate <= 8]
+  // corresponding to [13, 26, 52, ..., 1664] Hz
+  gyroODR = 13 * pow(2, rate - 1); 
+
+  Serial.print("Setting Gyro ODR to ");
+  Serial.print(gyroODR);
+  Serial.println(" Hz.");
 }
 
 void LSM6::setAccDataOutputRate(ODR rate)
@@ -120,6 +136,14 @@ void LSM6::setAccDataOutputRate(ODR rate)
   uint8_t settings = readReg(LSM6::CTRL1_XL);
   settings &= 0x0f; //clear ODR bits
   writeReg(LSM6::CTRL1_XL, settings | (rate << 4));
+
+  // rate in this case is just a flag for the ODR [1 <= rate <= 8]
+  // corresponding to [13, 26, 52, ..., 1664] Hz
+  accODR = 13 * pow(2, rate - 1); 
+
+  Serial.print("Setting Acc ODR to ");
+  Serial.print(accODR);
+  Serial.println(" Hz.");
 }
 
 bool LSM6::init(deviceType device, sa0State sa0)
@@ -163,10 +187,11 @@ bool LSM6::init(deviceType device, sa0State sa0)
 
   switch (device)
   {
-  case device_DS33:
+  case device_DS33: // only this IMU for now...
     address = (sa0 == sa0_high) ? DS33_SA0_HIGH_ADDRESS : DS33_SA0_LOW_ADDRESS;
     break;
-  default:;
+  default:
+    break;
   }
 
   enableDefault();
@@ -178,34 +203,24 @@ bool LSM6::init(deviceType device, sa0State sa0)
 Enables the LSM6's accelerometer and gyro. Also:
 - Sets sensor full scales (gain) to default power-on values, which are
   +/- 2 g for accelerometer and 245 dps for gyro
-- Selects 1.66 kHz (high performance) ODR (output data rate) for accelerometer
-  and 1.66 kHz (high performance) ODR for gyro. (These are the ODR settings for
-  which the electrical characteristics are specified in the datasheet.)
+- Selects 13 Hz ODR (VERY SLOW!) for accelerometer and gyro
 - Enables automatic increment of register address during multiple byte access
-Note that this function will also reset other settings controlled by
+- Note that this function will also reset other settings controlled by
 the registers it writes to.
 */
 void LSM6::enableDefault(void)
 {
   if (_device == device_DS33)
   {
-    // Accelerometer
-
-    // 0x80 = 0b10000000
-    // ODR = 1000 (1.66 kHz (high performance)); FS_XL = 00 (+/-2 g full scale)
-    //writeReg(CTRL1_XL, 0x80);
-    setFullScaleAcc(ACC_FS2);
-
-    // Gyro
-
-    // 0x80 = 0b010000000
-    // ODR = 1000 (1.66 kHz (high performance)); FS_XL = 00 (245 dps)
-    //writeReg(CTRL2_G, 0x80);
+    // Set the gyro full scale and data rate
     setFullScaleGyro(GYRO_FS245);
-    // Common
+    setGyroDataOutputRate(ODR13);
 
-    // 0x04 = 0b00000100
-    // IF_INC = 1 (automatically increment register address)
+    // Set the accelerometer full scale and data rate
+    setFullScaleAcc(ACC_FS2);
+    setAccDataOutputRate(ODR13);
+
+    // Auto-increment
     writeReg(CTRL3_C, 0x04);
   }
 }

@@ -104,14 +104,9 @@ class LSM6
 
     vector<int16_t> a; // accelerometer readings
     vector<int16_t> g; // gyro readings
+
+    vector<float> acc;
     vector<float> dps;
-
-    //conversion factors
-    float mdps = 0;
-    float mg = 0;
-    //float odrGyro = 0;
-
-    uint8_t last_status; // status of last I2C transmission
 
     LSM6(void);
 
@@ -149,7 +144,7 @@ public:
 
     int16_t testReg(uint8_t address, regAddr reg);
 
-//conversion factors are set when you change ODR or FS
+    //conversion factors are set when you change ODR or FS
     float mdpsPerLSB = 0;
     float mgPerLSB = 0;
     float accODR = 0;   // Hz

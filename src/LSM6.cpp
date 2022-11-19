@@ -318,14 +318,6 @@ void LSM6::read(void)
   readGyro();
 }
 
-// void LSM6::vector_normalize(vector<float> *a)
-// {
-//   float mag = sqrt(vector_dot(a, a));
-//   a->x /= mag;
-//   a->y /= mag;
-//   a->z /= mag;
-// }
-
 // Private Methods //////////////////////////////////////////////////////////////
 
 int16_t LSM6::testReg(uint8_t address, regAddr reg)

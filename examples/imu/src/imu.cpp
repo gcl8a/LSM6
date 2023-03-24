@@ -29,6 +29,8 @@ void setup()
       delay(100);
     }
   }
+
+  // TODO: Adjust the ODR and FS here when you get to that part. See LSM6.h/.cpp for options
 }
 
 bool showAcc = true;

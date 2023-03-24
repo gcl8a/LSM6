@@ -3,6 +3,7 @@
 // Datasheet: https://www.pololu.com/file/0J1087/LSM6DS33.pdf
 
 #include <Arduino.h>
+#include <Wire.h>
 
 class LSM6
 {

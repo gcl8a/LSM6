@@ -138,9 +138,6 @@ public:
 
     uint8_t getStatus(void) {return readReg(LSM6::STATUS_REG);}
 
-    //bool updateAttitude(Pose& pose);
-    //void updateBias(void);
-
   private:
     deviceType _device; // chip type
     uint8_t address;

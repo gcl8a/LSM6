@@ -1,6 +1,5 @@
 #include <Wire.h>
 #include <LSM6.h>
-//#include <math.h>
 
 // Defines ////////////////////////////////////////////////////////////////
 
@@ -220,7 +219,7 @@ void LSM6::enableDefault(void)
     setFullScaleAcc(ACC_FS2);
     setAccDataOutputRate(ODR13);
 
-    // Auto-increment
+    // Auto-increment -- this makes it so you can easily read multiple registers
     writeReg(CTRL3_C, 0x04);
   }
 }

@@ -2,14 +2,13 @@
 // accelerometer and gyro and prints those raw values to the
 // Serial Monitor.
 
-#include <Romi32U4Buttons.h>
-
 #include <Wire.h> // I2C library
 #include <LSM6.h>
+#include <button.h>
 
 // to control printout; you'll need the Romi-32u4-utilities library
-Romi32U4ButtonB buttonB;
-Romi32U4ButtonC buttonC;
+Button buttonB(30);
+Button buttonC(17);
 
 // the IMU
 LSM6 imu;
@@ -20,17 +19,18 @@ void setup()
 
   Wire.begin();
 
+  buttonB.init();
+  buttonC.init();
+
   if (!imu.init())
   {
     // Failed to detect the LSM6.
     while(1)
     {
-      Serial.println(F("Failed to detect the LSM6. Just smash that reset button."));
+      Serial.println(F("Failed to detect the LSM6. It happens sometimes. Just smash that reset button."));
       delay(100);
     }
   }
-
-  // TODO: Adjust the ODR and FS here when you get to that part. See LSM6.h/.cpp for options
 }
 
 bool showAcc = true;
@@ -39,8 +39,8 @@ bool showGyro = false;
 void loop()
 {
   // while you can print both, it will be messy because the order is not guaranteed
-  if(buttonB.getSingleDebouncedPress()) showAcc = !showAcc;
-  if(buttonC.getSingleDebouncedPress()) showGyro = !showGyro;
+  if(buttonB.checkButtonPress()) showAcc = !showAcc;
+  if(buttonC.checkButtonPress()) showGyro = !showGyro;
 
   if(showAcc)
   {

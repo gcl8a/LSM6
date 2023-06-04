@@ -340,40 +340,40 @@ int16_t LSM6::testReg(uint8_t address, regAddr reg)
   }
 }
 
-#define KAPPA 0.1
-bool LSM6::updateAttitude(Pose& pose)
-{
-  bool retVal = false;
+// #define KAPPA 0.1
+// bool LSM6::updateAttitude(Pose& pose)
+// {
+//   bool retVal = false;
 
-    /**
-     * Yaw
-    */
-    pose.yaw += (g.z - bias.z) * mdpsPerLSB / (gyroODR * 1000.); //
+//     /**
+//      * Yaw
+//     */
+//     pose.yaw += (g.z - bias.z) * mdpsPerLSB / (gyroODR * 1000.); //
 
-    /**
-     * Complementary filter for pitch
-    */
-    float prediction = pose.pitch + (g.y - bias.y) * mdpsPerLSB / (accODR * 1000.); //degrees
-    float observation = atan2(-a.x, a.z) * 180.0 / M_PI;
-    pose.pitch = prediction + KAPPA * (observation - prediction);
-    bias.y -= 0.01 * (accODR * 1000.) / mdpsPerLSB * (observation - prediction);
+//     /**
+//      * Complementary filter for pitch
+//     */
+//     float prediction = pose.pitch + (g.y - bias.y) * mdpsPerLSB / (accODR * 1000.); //degrees
+//     float observation = atan2(-a.x, a.z) * 180.0 / M_PI;
+//     pose.pitch = prediction + KAPPA * (observation - prediction);
+//     bias.y -= 0.01 * (accODR * 1000.) / mdpsPerLSB * (observation - prediction);
 
-#ifdef __DEBUG_IMU__
-    Serial.print(prediction);
-    Serial.print('\t');
-    Serial.print(observation);
-    Serial.print('\t');
-    Serial.print(pose.pitch);
-    Serial.print('\n');
-#endif
+// #ifdef __DEBUG_IMU__
+//     Serial.print(prediction);
+//     Serial.print('\t');
+//     Serial.print(observation);
+//     Serial.print('\t');
+//     Serial.print(pose.pitch);
+//     Serial.print('\n');
+// #endif
 
-    retVal = true;
+//     retVal = true;
 
-  return retVal;
-}
+//   return retVal;
+// }
 
-#define SIGMA 0.1
-void LSM6::updateBias(void)
-{
-  bias.z = SIGMA * g.z + (1.0 - SIGMA) * bias.z;
-}
+// #define SIGMA 0.1
+// void LSM6::updateBias(void)
+// {
+//   bias.z = SIGMA * g.z + (1.0 - SIGMA) * bias.z;
+// }

@@ -6,7 +6,7 @@
 #include <LSM6.h>
 #include <button.h>
 
-// to control printout; you'll need the Romi-32u4-utilities library
+// press buttons to control printout
 Button buttonB(30);
 Button buttonC(17);
 

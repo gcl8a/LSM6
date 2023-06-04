@@ -156,7 +156,5 @@ public:
     float accODR = 0;   // Hz
     float gyroODR = 0;  // Hz
 
-    //float gyroBias = 0;
-
     uint8_t last_status; // status of last I2C transmission
 };

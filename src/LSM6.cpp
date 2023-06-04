@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <LSM6.h>
-#include <math.h>
+//#include <math.h>
 
 // Defines ////////////////////////////////////////////////////////////////
 
@@ -118,7 +118,7 @@ void LSM6::setGyroDataOutputRate(ODR rate)
 
   // rate in this case is just a flag for the ODR [1 <= rate <= 8]
   // corresponding to [13, 26, 52, ..., 1664] Hz
-  gyroODR = 13 * pow(2, rate - 1); 
+  gyroODR = 13 * (2 << (rate - 1));
 
   Serial.print("Setting Gyro ODR to ");
   Serial.print(gyroODR);
@@ -139,7 +139,7 @@ void LSM6::setAccDataOutputRate(ODR rate)
 
   // rate in this case is just a flag for the ODR [1 <= rate <= 8]
   // corresponding to [13, 26, 52, ..., 1664] Hz
-  accODR = 13 * pow(2, rate - 1); 
+  accODR = 13 * (2 << (rate - 1));
 
   Serial.print("Setting Acc ODR to ");
   Serial.print(accODR);

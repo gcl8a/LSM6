@@ -3,6 +3,8 @@
 // Datasheet: https://www.pololu.com/file/0J1087/LSM6DS33.pdf
 
 #include <Arduino.h>
+#include <Wire.h>
+#include <Pose.h>
 
 class LSM6
 {
@@ -104,6 +106,7 @@ class LSM6
 
     vector<int16_t> a; // accelerometer readings
     vector<int16_t> g; // gyro readings
+    vector<float> bias; // gyro readings
 
     vector<float> acc;
     vector<float> dps;
@@ -135,6 +138,9 @@ public:
 
     uint8_t getStatus(void) {return readReg(LSM6::STATUS_REG);}
 
+    bool updateAttitude(Pose& pose);
+    void updateBias(void);
+
   private:
     deviceType _device; // chip type
     uint8_t address;
@@ -149,6 +155,8 @@ public:
     float mgPerLSB = 0;
     float accODR = 0;   // Hz
     float gyroODR = 0;  // Hz
+
+    //float gyroBias = 0;
 
     uint8_t last_status; // status of last I2C transmission
 };

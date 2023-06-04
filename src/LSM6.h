@@ -150,6 +150,7 @@ public:
 
     int16_t testReg(uint8_t address, regAddr reg);
 
+public:
     //conversion factors are set when you change ODR or FS
     float mdpsPerLSB = 0;
     float mgPerLSB = 0;

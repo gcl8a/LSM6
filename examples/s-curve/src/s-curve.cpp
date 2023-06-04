@@ -2,14 +2,14 @@
 // accelerometer and gyro and prints those raw values to the
 // Serial Monitor.
 
+#include <Chassis.h>
 #include <Romi32U4Buttons.h>
 
 #include <Wire.h> // I2C library
 #include <LSM6.h>
 
 // to control printout; you'll need the Romi-32u4-utilities library
-Romi32U4ButtonB buttonB;
-Romi32U4ButtonC buttonC;
+Romi32U4ButtonB buttonA;
 
 // the IMU
 LSM6 imu;
@@ -29,8 +29,6 @@ void setup()
       delay(100);
     }
   }
-
-  // TODO: Adjust the ODR and FS here when you get to that part. See LSM6.h/.cpp for options
 }
 
 bool showAcc = true;
